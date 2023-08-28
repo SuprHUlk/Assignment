@@ -15,18 +15,18 @@ public class SessionController {
     @PostConstruct
     void initTable() {sessionService.initTable();}
 
-    @DeleteMapping({"/cancelSession"})
+    @DeleteMapping({"session/cancelSession"})
     public String cancelSession(@RequestBody Session session) {
         return sessionService.cancelSession(session);
     }
 
-    @PutMapping({"/rescheduleSession"})
+    @PutMapping({"session/rescheduleSession"})
     public String rescheduleSession(@RequestBody Session session) {
         return sessionService.rescheduleSession(session);
     }
 
     //Here frequency is number of session in a week and duration is number of months
-    @PostMapping({"/rebookSession"})
+    @PostMapping({"session/rebookSession"})
     public String rebookSession(@RequestBody Session session, @RequestParam int frequency, @RequestParam int duration) {
         return sessionService.rebookSession(session, frequency, duration);
     }

@@ -3,6 +3,7 @@ package com.example.demo.services;
 import com.example.demo.entity.Session;
 import com.example.demo.repository.SessionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -19,8 +20,8 @@ public class SessionService {
 
     //Initializes the table
     public void initTable() {
-        LocalDate date=LocalDate.of(2023, 8, 26);
-        LocalTime time=LocalTime.of(18, 0);
+        LocalDate date=LocalDate.of(2023, 8, 28);
+        LocalTime time=LocalTime.of(21, 0);
         LocalDateTime bookedAt=LocalDateTime.now();
 
         Session session=new Session();
@@ -57,6 +58,10 @@ public class SessionService {
     //A user can only reschedule the session if the difference btw current time and the session time is more than minDur
     public String rescheduleSession(Session session) {
 
+        Session oldSession=sessionRepository.findById(session.getId()).orElse(null);
+        LocalDate oldDate=oldSession.getDate();
+        LocalTime oldTime=oldSession.getTime();
+
         String mentorId=session.getMentorId();
         LocalDate rescheduledDate=session.getDate();
         LocalTime rescheduledTime=session.getTime();
@@ -72,7 +77,7 @@ public class SessionService {
         long minDur=4*60;
 
         //checks if the difference btw reschedule time and current time is greater than minDur or not
-        if(durCheck(rescheduledDate, rescheduledTime, minDur)) {
+        if(durCheck(oldDate, oldTime, minDur)) {
 
             session.setDate(rescheduledDate);
             session.setTime(rescheduledTime);
@@ -97,15 +102,18 @@ public class SessionService {
     private boolean durCheck(LocalDate sessionDate, LocalTime sessionTime, long minDur) {
 
         LocalDateTime sessionDateTime=LocalDateTime.of(sessionDate, sessionTime);
-        LocalDateTime curDateTime=LocalDateTime.of(LocalDate.now(), LocalTime.now());
+        LocalDateTime curDateTime=LocalDateTime.now();
         long dur=Duration.between(curDateTime, sessionDateTime).toMinutes();
-
         return dur>minDur;
     }
 
     //Logic for recurring session at regular intervals
     //Here frequency is number of session in a week and duration is number of months
     public String rebookSession(Session session, int frequency, int duration) {
+
+        if(frequency==0||duration==0) {
+            return "Frequency or duration cannot be zero";
+        }
 
         //Store all the new sessions created
         List<Session> sessions=new ArrayList<>();
@@ -132,9 +140,8 @@ public class SessionService {
         //Saves all the new session created in the table
         sessionRepository.saveAll(sessions);
 
-        return "Recurring on";
+        return "Recurring sessions created";
 
     }
-
 
 }

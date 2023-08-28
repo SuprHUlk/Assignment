@@ -6,8 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public interface SessionRepository extends JpaRepository<Session, String> {
+public interface SessionRepository extends JpaRepository<Session, Long> {
     boolean existsByMentorIdAndDateAndTime(String mentorId, LocalDate date, LocalTime time);
-
-    Session findByUserIdAndMentorId(String userId, String mentorId);
 }
